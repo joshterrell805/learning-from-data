@@ -1,4 +1,3 @@
-perceptron <- {}
 
 # `fileName` is a csv file which holds data in the row-format
 # x1,x2,y
@@ -13,7 +12,8 @@ perceptron.readData <- function(filename) {
 }
 
 perceptron.isMisclassified <- function(row, weights) {
-  sign(weights %*% row[1:3]) != row[4]
+  len <- length(row)
+  sign(weights %*% row[1:(len - 1)]) != row[len]
 }
 
 # Return the index of the first misclassified point using `weights` to
@@ -33,10 +33,15 @@ perceptron.findMisclassified <- function(d, weights) {
 }
 
 perceptron.adjustWeights <- function(weights, misclassified) {
-  weights + misclassified[4] * misclassified[1:3]
+  len <- length(misclassified)
+  weights + misclassified[len] * misclassified[1:(len - 1)]
 }
 
 perceptron.graph <- function(d, refreshInterval = 0.15, weights = c(0, 0, 0)) {
+  if (ncol(d) != 4) {
+    stop('dataset to graph must be 2D')
+  }
+
   repeat  {
     a <- (-weights[1] / weights[3])
     b <- (-weights[2] / weights[3])
@@ -61,4 +66,22 @@ perceptron.graph <- function(d, refreshInterval = 0.15, weights = c(0, 0, 0)) {
 
     weights <- perceptron.adjustWeights(weights, d[i, ])
   }
+}
+
+perceptron.randomDataset <- function(w, points) {
+  dimensions <- length(w) - 1
+
+  d <- matrix(runif(dimensions * points, -1, 1),
+      nrow = points, ncol = dimensions)
+  d <- cbind(cbind(1, d), 1)
+
+  for (i in 1:points) {
+    d[i, dimensions + 2] <- sign(w %*% d[i, 1:(dimensions + 1)])
+  }
+
+  d
+}
+
+perceptron.randomWeights <- function(dimensions) {
+  runif(dimensions + 1, -1, 1)
 }

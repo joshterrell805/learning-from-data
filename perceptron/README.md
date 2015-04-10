@@ -9,7 +9,12 @@ algorithm learning how to partition the data.
 ## Running The Algorithm
 ```R
 source('perceptron.R')
+
 perceptron.graph(perceptron.readData('samples.csv'))
+# or
+w <-perceptron.randomWeights(2)
+d <-perceptron.randomDataset(w, 500)
+perceptron.graph(d, 0.05)
 ```
 
 ## Running The Tests
