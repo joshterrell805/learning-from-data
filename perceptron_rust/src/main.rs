@@ -1,15 +1,21 @@
-mod perceptron;
-#[link(name="gsl", kind="dylib")]
-#[link(name="gslcblas", kind="dylib")]
+#![feature(libc)]
 
+extern crate libc;
+
+use libc::{c_double, c_float, c_int, c_void, size_t};
+
+#[link(name="openblas", kind="dylib")] 
 extern {
-  fn gsl_sf_bessel_J0(a: f64) -> f64;
+  fn cblas_sdot(n : c_int, x: *const c_float, inc_x: c_int, y: *const c_float,
+      inc_y: c_int) -> c_float;
 }
 
 fn main() {
-  let x = 5.0;
-  let y = unsafe {
-    gsl_sf_bessel_J0(x)
+  let x = vec![1.0f32, -2.0, 3.0, 4.0];
+  let y = vec![1.0f32, 1.0, 1.0, 1.0];
+
+  let d: f32 = unsafe {
+    cblas_sdot(4, x[..].as_ptr(), 1, y[..].as_ptr(), 1)
   };
-  println!("x: {}, y: {}", &x, &y);
+  println!("{:?}", &d);
 }
